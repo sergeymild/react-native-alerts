@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="MyDialogStyleLight" parent="Theme.AppCompat.Light">
+    <item name="md_corner_radius">20dp</item>
+    <item name="md_color_button_text">@android:color/black</item>
+    <item name="md_ripple_color">@android:color/darker_gray</item>
+    <item name="colorAccent">@android:color/darker_gray</item>
+  </style>
+
+  <style name="MyDialogStyleDark" parent="ThemeOverlay.AppCompat.Dark">
+    <item name="md_corner_radius">20dp</item>
+    <item name="md_ripple_color">@android:color/darker_gray</item>
+
+    <item name="md_color_title">#ffffff</item>
+    <item name="md_color_content">#ffffff</item>
+    <item name="md_color_button_text">#ffffff</item>
+    <item name="md_background_color">#292729</item>
+    <item name="colorAccent">#ffffff</item>
+  </style>
+</resources>
