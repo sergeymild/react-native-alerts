@@ -7,7 +7,7 @@ import {
 
 export type BottomSheetAlertButtonStyle = 'default' | 'destructive' | 'cancel';
 type Appearance = {
-  textAlign?: 'center';
+  textAlign?: 'center' | 'left';
   fontSize?: number;
   color?: string;
   fontFamily?: string;
@@ -15,7 +15,7 @@ type Appearance = {
 export interface BottomSheetAlertButton {
   readonly text: string;
   readonly style?: BottomSheetAlertButtonStyle;
-  readonly data?: any;
+  readonly id?: any;
   readonly icon?: ImageRequireSource;
   readonly appearance?: Appearance;
 }
@@ -36,7 +36,7 @@ interface BottomSheetAlertProperties {
   readonly cancelButtonBorderRadius?: number;
 }
 
-export class BottomSheetAlert {
+export class sheetAlert {
   static show(
     properties: BottomSheetAlertProperties
   ): Promise<BottomSheetAlertButton | undefined> {
@@ -75,13 +75,15 @@ export class BottomSheetAlert {
               : {
                   ...b.appearance,
                   color: processColor(b.appearance.color),
+                  textAlign: b.appearance.textAlign ?? 'center',
                 },
           })),
         },
         (index: number) => {
           if (index === -1) return resolve(undefined);
           const selected = properties.buttons[index];
-          resolve(selected);
+          if (!selected) return resolve(undefined);
+          resolve(selected.id);
         }
       );
     });

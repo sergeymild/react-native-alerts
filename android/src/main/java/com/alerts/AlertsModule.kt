@@ -25,6 +25,14 @@ import com.facebook.react.bridge.*
 import java.lang.ref.WeakReference
 import java.util.*
 
+fun MaterialDialog.safeInputText(): String? {
+  return try {
+    getInputField().text.toString()
+  } catch (e: Throwable) {
+    return null
+  }
+}
+
 class AlertsModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
 
@@ -78,19 +86,19 @@ class AlertsModule(reactContext: ReactApplicationContext) :
     }
     if (neutral != null) {
       materialDialog.neutralButton(text = neutral) {
-        onClick(Buttons.ARG_BUTTON_NEUTRAL, arguments, actionCallback, it.getInputField().text)
+        onClick(Buttons.ARG_BUTTON_NEUTRAL, arguments, actionCallback, it.safeInputText())
       }
       materialDialog.view.buttonsLayout!!.actionButtons[WhichButton.NEUTRAL.index].typeface = Typeface.DEFAULT_BOLD
     }
     if (positive != null) {
       materialDialog.positiveButton(text = positive) {
         if (type != "default") return@positiveButton
-        onClick(Buttons.ARG_BUTTON_POSITIVE, arguments, actionCallback, it.getInputField().text)
+        onClick(Buttons.ARG_BUTTON_POSITIVE, arguments, actionCallback, it.safeInputText())
       }
     }
     if (negative != null) {
       materialDialog.negativeButton(null, negative) {
-        onClick(Buttons.ARG_BUTTON_NEGATIVE, arguments, actionCallback, it.getInputField().text)
+        onClick(Buttons.ARG_BUTTON_NEGATIVE, arguments, actionCallback, it.safeInputText())
       }
       materialDialog.view.buttonsLayout!!.actionButtons[WhichButton.NEGATIVE.index].updateTextColor(Color.RED)
     }
