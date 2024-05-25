@@ -12,11 +12,17 @@ type Appearance = {
   color?: string;
   fontFamily?: string;
 };
+
+type AssetButtonIcon = {type: 'asset', icon: string}
+type DrawableButtonIcon = {type: 'drawable', icon: string}
+type ResourceButtonIcon = {type: 'require', icon: ImageRequireSource}
+type ButtonIcon = AssetButtonIcon | DrawableButtonIcon | ResourceButtonIcon
+
 export interface BottomSheetAlertButton {
   readonly text: string;
   readonly style?: BottomSheetAlertButtonStyle;
   readonly id?: any;
-  readonly icon?: ImageRequireSource;
+  readonly icon?: ButtonIcon;
   readonly appearance?: Appearance;
 }
 
@@ -36,6 +42,19 @@ interface BottomSheetAlertProperties {
   readonly cancelButtonBorderRadius?: number;
 }
 
+function processIcon(icon: ButtonIcon | undefined) {
+  try {
+    if (!icon) return undefined
+    if (icon.type === 'require') {
+      return {type: 'drawable', icon: Image.resolveAssetSource(icon.icon as number).uri}
+    }
+    return icon
+  } catch (e) {
+    console.warn('[BottomSheet.processIcon.errro]', e)
+  }
+  return undefined
+}
+
 export class sheetAlert {
   static show(
     properties: BottomSheetAlertProperties
@@ -48,35 +67,35 @@ export class sheetAlert {
           title: !properties.title
             ? undefined
             : {
-                text: properties.title.text,
-                appearance: !properties.title.appearance
-                  ? undefined
-                  : {
-                      ...properties.title.appearance,
-                      color: processColor(properties.title.appearance.color),
-                    },
-              },
+              text: properties.title.text,
+              appearance: !properties.title.appearance
+                ? undefined
+                : {
+                  ...properties.title.appearance,
+                  color: processColor(properties.title.appearance.color),
+                },
+            },
           message: !properties.message
             ? undefined
             : {
-                text: properties.message.text,
-                appearance: !properties.message.appearance
-                  ? undefined
-                  : {
-                      ...properties.message.appearance,
-                      color: processColor(properties.message.appearance.color),
-                    },
-              },
+              text: properties.message.text,
+              appearance: !properties.message.appearance
+                ? undefined
+                : {
+                  ...properties.message.appearance,
+                  color: processColor(properties.message.appearance.color),
+                },
+            },
           buttons: properties.buttons.map((b) => ({
             ...b,
-            icon: b.icon ? Image.resolveAssetSource(b.icon).uri : undefined,
+            icon: processIcon(b.icon),
             appearance: !b.appearance
               ? undefined
               : {
-                  ...b.appearance,
-                  color: processColor(b.appearance.color),
-                  textAlign: b.appearance.textAlign ?? 'center',
-                },
+                ...b.appearance,
+                color: processColor(b.appearance.color),
+                textAlign: b.appearance.textAlign ?? 'center',
+              },
           })),
         },
         (index: number) => {

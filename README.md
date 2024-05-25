@@ -116,6 +116,16 @@ buttons: [
     id: 'someId',
     // default | destructive | cancel
     style: 'default',
+    // --- on Android icon might be either in assets or drawable
+    // if icon in assets just pass asset:/icon_name.png
+    // if icon in drawable just pass icon_name.png
+    // or pass require('src/assets/icon.png')
+
+    // --- on Android icon might be either in assets or drawable
+    // if icon in assets just pass icon_name.png
+    // if icon in drawable (bundle, Images.xcassets) just pass icon_name.png
+    // or pass require('src/assets/icon.png')
+    icon?: {type: 'asset' | 'drawable' | 'require', icon: string | ImageRequireSource}
     // android only
     appearance: Appearance,
   },

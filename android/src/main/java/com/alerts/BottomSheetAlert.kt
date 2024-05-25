@@ -17,10 +17,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.cardview.widget.CardView
+import com.facebook.drawee.drawable.DrawableUtils
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.ColorPropConverter
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.net.URI
@@ -39,6 +41,11 @@ fun ReadableMap.double(key: String): Double? {
 fun ReadableMap.string(key: String): String? {
   if (!hasKey(key)) return null
   return getString(key)
+}
+
+fun ReadableMap.map(key: String): ReadableMap? {
+  if (!hasKey(key)) return null
+  return getMap(key)
 }
 
 
@@ -118,7 +125,7 @@ class BottomSheetAlert(private val context: Activity, private val options: Reada
       val appearance = readableMap.getMap("appearance")
       val style = readableMap.getString("style")
       val text = readableMap.getString("text")
-      val icon = getIcon(context, readableMap.getString("icon"))
+      val icon = getIcon(context, readableMap.map("icon"))
       val isCancel = style != null && style == "cancel"
       if (isCancel) {
         cancelButtonIndex = i
@@ -127,7 +134,7 @@ class BottomSheetAlert(private val context: Activity, private val options: Reada
       val isDestructive = style != null && style == "destructive"
       var color = appearance.color(context, "color", tintColor)
       if (isDestructive) {
-        color = if (isDark) Color.argb((255 * 0.8).toInt(), 176, 0, 32) else Color.rgb(176, 0, 32)
+        color = if (isDark) Color.RED else Color.RED
       }
       val listItemView = LayoutInflater.from(context).inflate(R.layout.sheet_button, verticalContainer, false) as LinearLayout
       val titleView = listItemView.findViewById<TextView>(R.id.title)
@@ -183,15 +190,29 @@ class BottomSheetAlert(private val context: Activity, private val options: Reada
 }
 
 
-fun getIcon(activity: Activity, source: String?): Bitmap? {
-  source ?: return null
-  val resourceId: Int =
-    activity.resources.getIdentifier(source, "drawable", activity.packageName)
+fun getIcon(activity: Activity, source: ReadableMap?): Bitmap? {
+  try {
+    source ?: return null
+    if (source.string("type") == "drawable") {
+      val resourceId = activity.resources.getIdentifier(source.string("icon"), "drawable", activity.packageName)
 
-  return if (resourceId == 0) {
-    val uri = URI(source)
-    BitmapFactory.decodeStream(uri.toURL().openConnection().getInputStream())
-  } else {
-    BitmapFactory.decodeResource(activity.resources, resourceId)
+      return if (resourceId == 0) {
+        null
+      } else {
+        BitmapFactory.decodeResource(activity.resources, resourceId)
+      }
+    }
+
+    if (source.string("type") == "asset") {
+      val asset = activity.application.assets.open(
+        source.string("icon")!!
+          .replace("asset:/", "")
+          .replace("asset://", "")
+      )
+      return asset.use { BitmapFactory.decodeStream(it) }
+    }
+    return null
+  } catch (e: Throwable) {
+    return null
   }
 }

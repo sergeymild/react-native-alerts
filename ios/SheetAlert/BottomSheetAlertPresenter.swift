@@ -13,11 +13,25 @@ class AppAlertController: UIAlertController {
     }
 }
 
+
 class BottomSheetAlertPresenter {
     var strongSelf: BottomSheetAlertPresenter?
 
     var alertWindow: UIWindow?
     var currentAlert: UIAlertController?
+    
+    private func resizeImage(image: UIImage?, newWidth: CGFloat) -> UIImage? {
+        guard let image else { return nil }
+        if image.size.width <= newWidth { return image }
+        let scale = newWidth / image.size.width
+        let newHeight = image.size.height * scale
+        UIGraphicsBeginImageContext(CGSizeMake(newWidth, newHeight))
+        image.draw(in: CGRectMake(0, 0, newWidth, newHeight))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage
+    }
 
     private func createAlertWindow() {
         if alertWindow != nil { return }
@@ -75,7 +89,19 @@ class BottomSheetAlertPresenter {
                 if alignment != .center {
                     action.setValue(alignment, forKey: "titleTextAlignment")
                 }
-                //galleryActionButton.setValue(#imageLiteral(resourceName: "gallery"), forKey: "image")
+                if let icon = button["icon"] as? [String: Any] {
+                    let _type = icon["type"] as? String
+                    let _icon = icon["icon"] as! String
+                    if _type == "asset" {
+                        var image = UIImage(named: _icon)
+                        image = resizeImage(image: image, newWidth: 20)
+                        action.setValue(image, forKey: "image")
+                    } else if _type == "drawable" {
+                        var image = RCTConvert.uiImage(_icon)
+                        image = resizeImage(image: image, newWidth: 20)
+                        action.setValue(image, forKey: "image")
+                    }
+                }
                 alert.addAction(action)
                 previousBottomSheet = alert
             }
