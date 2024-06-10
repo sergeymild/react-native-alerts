@@ -13,6 +13,7 @@ import android.os.Looper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
@@ -26,6 +27,7 @@ import com.facebook.react.views.imagehelper.ResourceDrawableIdHelper
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.net.URI
+import kotlin.math.min
 
 fun ReadableMap?.color(context: Context, key: String, default: Int): Int {
   if (this == null) return default
@@ -63,6 +65,7 @@ fun TextView.applyTextStyle(appearance: ReadableMap?) {
 
 class BottomSheetAlert(private val context: Activity, private val options: ReadableMap) {
   private val density = context.resources.displayMetrics.density
+  private val width = context.resources.displayMetrics.widthPixels
   @SuppressLint("RestrictedApi")
   fun create(isDark: Boolean, actionCallback: Callback): BottomSheetDialog? {
     val backgroundColor = if (isDark) Color.parseColor("#121212") else Color.WHITE
@@ -80,6 +83,7 @@ class BottomSheetAlert(private val context: Activity, private val options: Reada
     baseLayout.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).also {
       it.marginEnd = (density * 16).toInt()
       it.marginStart = (density * 16).toInt()
+      it.width = min((560 * density).toInt(), (width - 32 * density).toInt())
     }
 
     val buttonsContainer = LayoutInflater.from(context).inflate(R.layout.base_layout, baseLayout, false) as CardView
@@ -181,7 +185,11 @@ class BottomSheetAlert(private val context: Activity, private val options: Reada
       actionCallback.invoke(Arguments.fromList(listOf(cancelButtonIndex)))
     }
 
-    dialog.setContentView(baseLayout)
+    val frame = LinearLayout(context)
+    frame.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
+    frame.gravity = Gravity.CENTER_HORIZONTAL
+    frame.addView(baseLayout)
+    dialog.setContentView(frame)
     val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
     bottomSheet?.setBackgroundColor(Color.TRANSPARENT)
     return dialog

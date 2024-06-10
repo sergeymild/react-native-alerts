@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import { Alert, Text, TouchableOpacity } from 'react-native';
 import { alert } from 'react-native-alerts';
 
 export const AlertsExamples: React.FC = () => {
@@ -77,6 +77,14 @@ export const AlertsExamples: React.FC = () => {
         }}
       >
         <Text children={'Base dark secure Input Alert'} />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={async () => {
+          Alert.alert('title', 'message', [{ text: 'ok' }]);
+        }}
+      >
+        <Text children={'Rn Alert'} />
       </TouchableOpacity>
     </>
   );

@@ -109,6 +109,18 @@ class BottomSheetAlertPresenter {
             if #available(iOS 13.0, *) {
                 alert.overrideUserInterfaceStyle = isDark ? .dark : .light
             }
+            
+            if let popoverController = alert.popoverPresentationController {
+                popoverController.sourceView = controller.view
+                popoverController.sourceRect = CGRect(
+                    x: controller.view.bounds.midX,
+                    y: controller.view.bounds.midY,
+                    width: 0,
+                    height: 0
+                )
+                popoverController.permittedArrowDirections = []
+            }
+            
             controller.present(alert, animated: true)
             alert.onDismiss = { [weak self] in
                 debugPrint("didDismiss")

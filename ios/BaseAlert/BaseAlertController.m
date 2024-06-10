@@ -29,6 +29,8 @@
 
 - (void)hide
 {
+  [_alertWindow setHidden:YES];
+  _alertWindow.windowScene = nil;
   _alertWindow = nil;
 }
 
