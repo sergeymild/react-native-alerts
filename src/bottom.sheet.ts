@@ -58,7 +58,7 @@ function processIcon(icon: ButtonIcon | undefined) {
 export class sheetAlert {
   static show(
     properties: BottomSheetAlertProperties
-  ): Promise<BottomSheetAlertButton | undefined> {
+  ): Promise<string | undefined> {
     return new Promise((resolve) => {
       NativeModules.BottomSheetAlert.show(
         {
