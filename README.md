@@ -5,7 +5,7 @@ Native Alerts for RN
 ## Installation
 
 ```sh
-"react-native-alerts": "sergeymild/react-native-alerts#1.0.0"
+"react-native-alerts": "sergeymild/react-native-alerts#1.1.1"
 ```
 
 | ![React Native Bottom Sheet](./docs/ios.gif)  |![React Native Bottom Sheet](./docs/android.gif)   |
