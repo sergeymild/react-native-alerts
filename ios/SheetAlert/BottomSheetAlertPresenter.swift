@@ -25,12 +25,19 @@ class BottomSheetAlertPresenter {
         if image.size.width <= newWidth { return image }
         let scale = newWidth / image.size.width
         let newHeight = image.size.height * scale
-        UIGraphicsBeginImageContext(CGSizeMake(newWidth, newHeight))
-        image.draw(in: CGRectMake(0, 0, newWidth, newHeight))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-
-        return newImage
+        
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 3  // Keep the scale factor 1 to avoid scaling the context
+        format.opaque = false
+        format.preferredRange = .standard
+        
+        let newSize = CGSize(width: newWidth, height: newHeight)
+        let renderer = UIGraphicsImageRenderer(size: newSize, format: format)
+        
+        let resizedImage = renderer.image { (context) in
+            image.draw(in: CGRect(origin: .zero, size: newSize))
+        }
+        return resizedImage
     }
 
     private func createAlertWindow() {
@@ -97,7 +104,7 @@ class BottomSheetAlertPresenter {
                         image = resizeImage(image: image, newWidth: 20)
                         action.setValue(image, forKey: "image")
                     } else if _type == "drawable" {
-                        var image = RCTConvert.uiImage(_icon)
+                        var image = RCTConvert.uiImage(["__packager_asset": true, "uri": _icon])
                         image = resizeImage(image: image, newWidth: 20)
                         action.setValue(image, forKey: "image")
                     }
