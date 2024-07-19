@@ -23,11 +23,15 @@ export type AlertType = 'default' | 'plain-text' | 'secure-text';
 type PromptParams = {
   title?: string;
   message?: string;
-  buttons?: Array<AlertButton>;
-  type: AlertType;
+  buttons: Array<AlertButton>;
+  fields: Array<{
+    placeholder: string;
+    id: string;
+    keyboardType?: KeyboardType;
+    defaultValue?: string;
+    security?: boolean;
+  }>;
   theme?: 'dark' | 'light' | 'system';
-  defaultValue?: string;
-  keyboardType?: KeyboardType;
 };
 
 export const alert = {
@@ -61,7 +65,10 @@ export const alert = {
   },
 
   prompt(params: PromptParams) {
-    return new Promise((resolve) => {
+    return new Promise<{
+      id: string;
+      values: Record<string, string> | undefined;
+    }>((resolve) => {
       if (!params.buttons || params.buttons.length === 0) {
         params.buttons = [{ text: 'Ok', style: 'default', id: 'ok' }];
       }
@@ -69,18 +76,16 @@ export const alert = {
         {
           title: params.title || undefined,
           message: params.message || undefined,
-          type: params.type || 'plain-text',
-          defaultValue: params.defaultValue,
-          keyboardType: params.keyboardType,
           theme: params.theme,
+          fields: params.fields,
           buttons: params.buttons.map((b) => ({
             text: b.text,
             style: b.style,
             id: b.id,
           })),
         },
-        (id: string, value: string | undefined) => {
-          resolve({ id, value });
+        (id: string, values: Record<string, string> | undefined) => {
+          resolve({ id, values });
         }
       );
     });
