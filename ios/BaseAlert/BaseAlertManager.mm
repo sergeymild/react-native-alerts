@@ -58,19 +58,16 @@ RCT_EXPORT_METHOD(alertWithArgs:(NSDictionary*)args
     dispatch_async(dispatch_get_main_queue(), ^{
         [self invalidate];
         NSString *title = [RCTConvert NSString:[args valueForKey:@"title"]];
+        NSString *type = [RCTConvert NSString:[args valueForKey:@"type"]];
         NSString *message = [RCTConvert NSString:[args valueForKey:@"message"]];
         NSString *theme = [RCTConvert NSString:[args valueForKey:@"theme"]];
         NSObject* btns = [args valueForKey:@"buttons"];
         NSObject* fields = [args valueForKey:@"fields"];
         NSArray<NSDictionary *> *buttonsArray = [[NSArray<NSDictionary *> alloc] init];
         NSArray<NSDictionary *> *fieldsArray = [[NSArray<NSDictionary *> alloc] init];
-        if (btns != NULL) {
-            buttonsArray = [RCTConvert NSDictionaryArray:btns];
-        }
 
-        if (fields != NULL) {
-            fieldsArray = [RCTConvert NSDictionaryArray:fields];
-        }
+        if (btns != NULL) buttonsArray = [RCTConvert NSDictionaryArray:btns];
+        if (fields != NULL) fieldsArray = [RCTConvert NSDictionaryArray:fields];
 
         if (!title && !message) {
             RCTLogError(@"Must specify either an alert title, or message, or both");
@@ -94,19 +91,23 @@ RCT_EXPORT_METHOD(alertWithArgs:(NSDictionary*)args
             }
         }
 
-        for (NSDictionary<NSString *, id> *field in fieldsArray) {
-            NSString *defaultValue = [RCTConvert NSString:[args valueForKey:@"defaultValue"]];
-            UIKeyboardType keyboardType = [RCTConvert UIKeyboardType:[args valueForKey:@"keyboardType"]];
-            BOOL isSecurity = [RCTConvert BOOL:field[@"security"]];
+        if ([type isEqualToString:@"prompt"]) {
+            for (NSDictionary<NSString *, id> *field in fieldsArray) {
+                NSString *defaultValue = [RCTConvert NSString:[args valueForKey:@"defaultValue"]];
+                UIKeyboardType keyboardType = [RCTConvert UIKeyboardType:[args valueForKey:@"keyboardType"]];
+                BOOL isSecurity = [RCTConvert BOOL:field[@"security"]];
 
-            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                textField.secureTextEntry = isSecurity;
-                textField.keyboardType = keyboardType;
-                textField.accessibilityIdentifier = field[@"id"];
-                textField.text = defaultValue;
-                textField.placeholder = [RCTConvert NSString:field[@"placeholder"]];
-            }];
+                [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                    textField.secureTextEntry = isSecurity;
+                    textField.keyboardType = keyboardType;
+                    textField.accessibilityIdentifier = field[@"id"];
+                    textField.text = defaultValue;
+                    textField.placeholder = [RCTConvert NSString:field[@"placeholder"]];
+                }];
+            }
         }
+
+
 
         alertController.message = message;
 
@@ -130,19 +131,23 @@ RCT_EXPORT_METHOD(alertWithArgs:(NSDictionary*)args
                         style:buttonStyle
                         handler:^(__unused UIAlertAction *action) {
 
-                NSMutableDictionary<NSString*, NSString*>* values = [[NSMutableDictionary alloc] initWithCapacity:[fieldsArray count]];
+                if ([type isEqualToString:@"prompt"]) {
+                    NSMutableDictionary<NSString*, NSString*>* values = [[NSMutableDictionary alloc] initWithCapacity:[fieldsArray count]];
+                    for (NSDictionary<NSString *, id> *field in fieldsArray) {
+                        NSString* fieldId = field[@"id"];
 
-                for (NSDictionary<NSString *, id> *field in fieldsArray) {
-                    NSString* fieldId = field[@"id"];
-
-                    for (UITextField* textField in weakAlertController.textFields) {
-                        if ([fieldId isEqualToString:textField.accessibilityIdentifier]) {
-                            values[fieldId] = textField.text;
+                        for (UITextField* textField in weakAlertController.textFields) {
+                            if ([fieldId isEqualToString:textField.accessibilityIdentifier]) {
+                                values[fieldId] = textField.text;
+                            }
                         }
                     }
+                    callback(@[ buttonId, values ]);
+                } else {
+                    callback(@[ buttonId ]);
                 }
 
-                callback(@[ buttonId, values ]);
+
                 [weakAlertController hide];
             }]];
         }

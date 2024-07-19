@@ -18,8 +18,6 @@ const AlertManager = NativeModules.BaseAlert
       }
     );
 
-export type AlertType = 'default' | 'plain-text' | 'secure-text';
-
 type PromptParams = {
   title?: string;
   message?: string;
@@ -40,15 +38,15 @@ export const alert = {
   },
 
   alert(params: AlertParams) {
-    return new Promise((resolve) => {
+    return new Promise<string | undefined>((resolve) => {
       if (!params.buttons || params.buttons.length === 0) {
         params.buttons = [{ text: 'Ok', style: 'default', id: 'ok' }];
       }
       AlertManager.alertWithArgs(
         {
+          type: 'default',
           title: params.title || '',
           message: params.message || undefined,
-          type: 'default',
           theme: params.theme,
           buttons: params.buttons.map((b) => ({
             text: b.text,
@@ -56,8 +54,7 @@ export const alert = {
             id: b.id,
           })),
         },
-        (data: any) => {
-          console.log('🍓[Alert.]', data);
+        (data: string | undefined) => {
           resolve(data);
         }
       );
@@ -74,6 +71,7 @@ export const alert = {
       }
       AlertManager.alertWithArgs(
         {
+          type: 'prompt',
           title: params.title || undefined,
           message: params.message || undefined,
           theme: params.theme,
