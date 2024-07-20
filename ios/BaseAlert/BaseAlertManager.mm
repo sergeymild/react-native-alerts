@@ -93,8 +93,8 @@ RCT_EXPORT_METHOD(alertWithArgs:(NSDictionary*)args
 
         if ([type isEqualToString:@"prompt"]) {
             for (NSDictionary<NSString *, id> *field in fieldsArray) {
-                NSString *defaultValue = [RCTConvert NSString:[args valueForKey:@"defaultValue"]];
-                UIKeyboardType keyboardType = [RCTConvert UIKeyboardType:[args valueForKey:@"keyboardType"]];
+                NSString *defaultValue = [RCTConvert NSString:[field valueForKey:@"defaultValue"]];
+                UIKeyboardType keyboardType = [RCTConvert UIKeyboardType:[field valueForKey:@"keyboardType"]];
                 BOOL isSecurity = [RCTConvert BOOL:field[@"security"]];
 
                 [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
