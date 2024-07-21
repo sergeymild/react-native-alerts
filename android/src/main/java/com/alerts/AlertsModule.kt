@@ -1,183 +1,182 @@
 package com.alerts
 
 
-import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.Typeface
-import android.os.Bundle
+import android.graphics.Outline
+import android.graphics.drawable.ColorDrawable
 import android.text.InputType
-import android.view.ContextThemeWrapper
+import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.View
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.WhichButton
-import com.afollestad.materialdialogs.input.getInputField
-import com.afollestad.materialdialogs.input.input
-import com.alerts.AlertsModule.AlertFragment.ARG_DEFAULT_VALUE
-import com.alerts.AlertsModule.AlertFragment.ARG_KEYBOARD_TYPE
-import com.alerts.AlertsModule.AlertFragment.ARG_MESSAGE
-import com.alerts.AlertsModule.AlertFragment.ARG_THEME
-import com.alerts.AlertsModule.AlertFragment.ARG_TITLE
-import com.alerts.AlertsModule.AlertFragment.ARG_TYPE
-import com.alerts.AlertsModule.AlertFragment.KEY_ITEMS
-import com.alerts.AlertsModule.AlertFragment.KEY_MESSAGE
-import com.alerts.AlertsModule.AlertFragment.KEY_TITLE
-import com.facebook.react.bridge.*
-import java.lang.ref.WeakReference
-import java.util.*
+import android.view.ViewOutlineProvider
+import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Callback
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.UiThreadUtil
+import com.google.android.material.textfield.TextInputLayout
 
-fun MaterialDialog.safeInputText(): String? {
-  return try {
-    getInputField().text.toString()
-  } catch (e: Throwable) {
-    return null
+
+fun View.setCornerRadius(r: Float) {
+  outlineProvider = object : ViewOutlineProvider() {
+    override fun getOutline(view: View, outline: Outline) {
+      val left = 0
+      val top = 0
+      val right = view.width
+      val bottom = view.height
+      val cornerRadius =
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, r, view.resources.displayMetrics)
+          .toInt()
+
+      outline.setRoundRect(left, top, right, bottom, cornerRadius.toFloat())
+    }
   }
+  clipToOutline = true
+}
+
+fun colorStateList(color: Int): ColorStateList {
+  val states = arrayOf(intArrayOf(android.R.attr.state_enabled))
+  val colors = intArrayOf(color)
+
+  return ColorStateList(states, colors)
 }
 
 class AlertsModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
 
-  private var presentedDialog: WeakReference<MaterialDialog>? = null
-
   override fun getName(): String {
     return "BaseAlert"
   }
 
-  private fun onClick(which: Buttons, arguments: Bundle?, callback: Callback, inputText: CharSequence? = null) {
-    if (arguments == null) return
-    callback.invoke(arguments.getString("button__id:${which.key}"), inputText?.toString())
-
-    presentedDialog?.clear()
-    presentedDialog = null
-  }
-
-  @ReactMethod
-  fun dismissTopPresented() {
-    presentedDialog?.get()?.dismiss()
-    presentedDialog?.clear()
-    presentedDialog = null
-  }
-
-  @SuppressLint("CheckResult", "RestrictedApi")
-  fun showNewAlert(arguments: Bundle, actionCallback: Callback) {
-    val activity = currentActivity ?: return
-    UiThreadUtil.assertOnUiThread()
-    dismissTopPresented()
-    val type = arguments.getString("type")
-    val positive = arguments.getString(Buttons.ARG_BUTTON_POSITIVE.key)
-    val neutral = arguments.getString(Buttons.ARG_BUTTON_NEUTRAL.key)
-    val negative = arguments.getString(Buttons.ARG_BUTTON_NEGATIVE.key)
-    val title = arguments.getString(ARG_TITLE)
-    val message = arguments.getString(ARG_MESSAGE)
-    val keyBoardType = arguments.getString(ARG_KEYBOARD_TYPE)
-    val theme = arguments.getString(ARG_THEME)
-    val contextThemeWrapper = ContextThemeWrapper(
-      activity,
-      if (theme == "light") R.style.MyDialogStyleLight else R.style.MyDialogStyleDark
-    )
-    val materialDialog = MaterialDialog(contextThemeWrapper)
-    materialDialog.cancelable(false)
-    if (!title.isNullOrEmpty()) {
-      materialDialog.title(null, title)
-    }
-    if (!message.isNullOrEmpty()) {
-      materialDialog.message(null, message, null)
-    } else {
-      materialDialog.view.contentLayout.visibility = View.GONE
-    }
-    if (neutral != null) {
-      materialDialog.neutralButton(text = neutral) {
-        onClick(Buttons.ARG_BUTTON_NEUTRAL, arguments, actionCallback, it.safeInputText())
-      }
-      materialDialog.view.buttonsLayout!!.actionButtons[WhichButton.NEUTRAL.index].typeface = Typeface.DEFAULT_BOLD
-    }
-    if (positive != null) {
-      materialDialog.positiveButton(text = positive) {
-        if (type != "default") return@positiveButton
-        onClick(Buttons.ARG_BUTTON_POSITIVE, arguments, actionCallback, it.safeInputText())
-      }
-    }
-    if (negative != null) {
-      materialDialog.negativeButton(null, negative) {
-        onClick(Buttons.ARG_BUTTON_NEGATIVE, arguments, actionCallback, it.safeInputText())
-      }
-      materialDialog.view.buttonsLayout!!.actionButtons[WhichButton.NEGATIVE.index].updateTextColor(Color.RED)
-    }
-    var inputType = InputType.TYPE_CLASS_TEXT
-    if (keyBoardType != null && (keyBoardType == "number-pad" || keyBoardType == "decimal-pad")) {
-      inputType = InputType.TYPE_CLASS_NUMBER
-    }
-    if (type == "secure-text") inputType = inputType or InputType.TYPE_TEXT_VARIATION_PASSWORD
-    if (type != "default") {
-      materialDialog.input(
-        prefill = arguments.getString("defaultValue"),
-        inputType = inputType,
-        waitForPositiveButton = true,
-        allowEmpty = true
-      ) { _, charSequence ->
-        onClick(Buttons.ARG_BUTTON_NEGATIVE, arguments, actionCallback, charSequence)
-      }
-    }
-    materialDialog.show()
-    presentedDialog = WeakReference(materialDialog)
-  }
-
-
   @ReactMethod
   fun alertWithArgs(options: ReadableMap, actionCallback: Callback) {
-    val args = Bundle()
-    if (options.hasKey("theme")) {
-      args.putString(ARG_THEME, options.getString("theme"))
-    }
-    if (options.hasKey(KEY_TITLE)) {
-      args.putString(ARG_TITLE, options.getString(KEY_TITLE))
-    }
-    if (options.hasKey("type")) {
-      args.putString(ARG_TYPE, options.getString("type"))
-    }
-    if (options.hasKey(KEY_MESSAGE)) {
-      args.putString(ARG_MESSAGE, options.getString(KEY_MESSAGE))
-    }
-    if (options.hasKey("defaultValue")) {
-      args.putString(ARG_DEFAULT_VALUE, options.getString("defaultValue"))
-    }
-    if (options.hasKey("keyboardType")) {
-      args.putString(ARG_KEYBOARD_TYPE, options.getString("keyboardType"))
-    }
-    if (options.hasKey(KEY_ITEMS)) {
-      val items = Objects.requireNonNull(options.getArray(KEY_ITEMS))
-      val ints = IntArray(items!!.size())
-      Arrays.fill(ints, Int.MIN_VALUE)
+    UiThreadUtil.runOnUiThread {
+      var alertDialog: AlertDialog? = null
+      val dialogBuilder = AlertDialog.Builder(currentActivity!!)
+      val dialogView = LayoutInflater.from(currentActivity!!).inflate(R.layout.layout_alert_prompt, null)
+      dialogBuilder.setView(dialogView)
+      dialogView.setCornerRadius(20f)
 
-      for (i in 0 until items.size()) {
-        val button = items.getMap(i)
-        val hashMap = button.toHashMap()
-        val style = hashMap["style"] as String
-        val id = hashMap["id"] as String
-        val text = hashMap["text"] as String
-        args.putString(style, text)
-        args.putString("button__id:${style}", id)
+      var isDark = false
+
+      if (options.hasKey("theme")) {
+        if (options.getString("theme") == "dark") {
+          isDark = true
+          dialogView.setBackgroundColor(Color.parseColor("#ff212121"))
+        }
       }
+
+      if (options.hasKey("title")) {
+        dialogView.findViewById<TextView>(R.id.alert_title).also {
+          if (isDark) it.setTextColor(Color.WHITE)
+          it.text = options.getString("title")
+          it.text = options.getString("title")
+          it.visibility = View.VISIBLE
+        }
+      }
+
+      if (options.hasKey("message")) {
+        dialogView.findViewById<TextView>(R.id.alert_message).also {
+          if (isDark) it.setTextColor(Color.WHITE)
+          it.text = options.getString("message")
+          it.visibility = View.VISIBLE
+        }
+      }
+
+      val editTexts = mutableMapOf<String, EditText>()
+      if (options.hasKey("buttons")) {
+        options.getArray("buttons")?.let { buttons ->
+          for (i in 0 until buttons.size()) {
+            val button = buttons.getMap(i)
+            val hashMap = button.toHashMap()
+            val style = hashMap["style"] as String
+            val id = hashMap["id"] as String
+            val text = hashMap["text"] as String
+
+            val clickListener = View.OnClickListener {
+              val args = Arguments.createMap()
+              editTexts.forEach {
+                args.putString(it.key, it.value.text?.toString())
+              }
+
+              editTexts.clear()
+              alertDialog?.dismiss()
+              actionCallback.invoke(id, args)
+            }
+
+            if (style == "cancel") {
+              val btn = dialogView.findViewById<Button>(R.id.cancel)
+              if (isDark) btn.setTextColor(Color.WHITE)
+              btn.visibility = View.VISIBLE
+              btn.text = text
+              btn.setOnClickListener(clickListener)
+            }
+
+            if (style == "destructive") {
+              val btn = dialogView.findViewById<Button>(R.id.destructive)
+              btn.visibility = View.VISIBLE
+              btn.text = text
+              btn.setOnClickListener(clickListener)
+            }
+
+            if (style == "default") {
+              val btn = dialogView.findViewById<Button>(R.id.positive)
+              if (isDark) btn.setTextColor(Color.WHITE)
+              btn.visibility = View.VISIBLE
+              btn.text = text
+              btn.setOnClickListener(clickListener)
+            }
+          }
+
+        }
+      }
+
+      if (options.hasKey("fields")) {
+        options.getArray("fields")?.let { fields ->
+          val container = dialogView.findViewById<LinearLayout>(R.id.content)
+          container.visibility = View.VISIBLE
+
+          for (i in 0 until fields.size()) {
+            val field = fields.getMap(i)
+            val hashMap = field.toHashMap()
+            val placeholder = hashMap["placeholder"] as? String
+            val defaultValue = hashMap["defaultValue"] as? String
+            val keyboardType = hashMap["keyboardType"] as? String
+            val security = hashMap["security"] as? Boolean
+            val id = hashMap["id"] as String
+
+            val editText = LayoutInflater.from(dialogView.context).inflate(R.layout.input, null)
+            val layout = editText.findViewById<TextInputLayout>(R.id.md_input_layout)
+            layout.hint = placeholder
+            layout.hintTextColor = colorStateList(if (isDark) Color.WHITE else Color.parseColor("#ff212121"))
+            layout.editText?.setTextColor(if (isDark) Color.WHITE else Color.parseColor("#ff212121"))
+            layout.editText?.setText(defaultValue ?: "")
+
+            if (keyboardType != null && (keyboardType == "number-pad" || keyboardType == "decimal-pad")) {
+              layout.editText?.inputType = InputType.TYPE_CLASS_NUMBER
+            }
+            if (security == true) {
+              layout.editText!!.inputType = layout.editText!!.inputType or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+
+            editTexts.put(id, layout.editText!!)
+            container.addView(editText)
+          }
+
+        }
+      }
+
+      alertDialog = dialogBuilder.create()
+      alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+      alertDialog.show()
     }
-    UiThreadUtil.runOnUiThread { showNewAlert(args, actionCallback) }
   }
-
-
-  object AlertFragment {
-    const val ARG_TITLE = "title"
-    const val ARG_THEME = "theme"
-    const val ARG_TYPE = "type"
-    const val ARG_MESSAGE = "message"
-    const val ARG_DEFAULT_VALUE = "defaultValue"
-    const val ARG_KEYBOARD_TYPE = "keyboardType"
-    const val KEY_ITEMS = "buttons"
-    const val KEY_MESSAGE = "message"
-    const val KEY_TITLE = "title"
-  }
-
-  enum class Buttons(val key: String) {
-    ARG_BUTTON_POSITIVE("default"),
-    ARG_BUTTON_NEGATIVE("destructive"),
-    ARG_BUTTON_NEUTRAL("cancel")
-  }
-
 }

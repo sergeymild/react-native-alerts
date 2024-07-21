@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.textfield.TextInputLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/md_input_layout"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content">
+
+  <com.google.android.material.textfield.TextInputEditText
+    android:id="@+id/md_input_message"
+    android:textCursorDrawable="@null"
+    android:maxLines="1"
+    android:singleLine="true"
+    android:inputType="text"
+    android:textColorHint="?android:colorPrimary"
+    android:textColor="?android:colorPrimary"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:text="Hello, World!" />
+</com.google.android.material.textfield.TextInputLayout>
+
