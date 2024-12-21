@@ -935,7 +935,7 @@ PODS:
   - React-Mapbuffer (0.74.1):
     - glog
     - React-debug
-  - react-native-alerts (0.1.0):
+  - react-native-alerts (1.1.7):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1395,7 +1395,7 @@ SPEC CHECKSUMS:
   React-jsitracing: 233d1a798fe0ff33b8e630b8f00f62c4a8115fbc
   React-logger: 7e7403a2b14c97f847d90763af76b84b152b6fce
   React-Mapbuffer: 11029dcd47c5c9e057a4092ab9c2a8d10a496a33
-  react-native-alerts: 186f747dc97e46d73a9de4525ba9410d77b458fd
+  react-native-alerts: 1c1ad86e2e1b503ce9204d3406da46beece33a44
   React-nativeconfig: b0073a590774e8b35192fead188a36d1dca23dec
   React-NativeModulesApple: df46ff3e3de5b842b30b4ca8a6caae6d7c8ab09f
   React-perflogger: 3d31e0d1e8ad891e43a09ac70b7b17a79773003a
@@ -1420,7 +1420,7 @@ SPEC CHECKSUMS:
   React-utils: 3285151c9d1e3a28a9586571fc81d521678c196d
   ReactCommon: f42444e384d82ab89184aed5d6f3142748b54768
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: 348f8b538c3ed4423eb58a8e5730feec50bce372
+  Yoga: b9a182ab00cf25926e7f79657d08c5d23c2d03b0
 
 PODFILE CHECKSUM: d7e97997da0d9cd0498f5bf20f203d2939daf818
 
