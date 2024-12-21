@@ -15,6 +15,8 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import com.facebook.fbreact.specs.NativeAlertManagerSpec
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.ReactApplicationContext
@@ -50,14 +52,20 @@ fun colorStateList(color: Int): ColorStateList {
 }
 
 class AlertsModule(reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext) {
-
-  override fun getName(): String {
-    return "BaseAlert"
+  NativeAlertsSpec(reactContext) {
+  companion object {
+    const val NAME: String = "Alerts"
   }
 
-  @ReactMethod
-  fun alertWithArgs(options: ReadableMap, actionCallback: Callback) {
+  override fun getName(): String {
+    return NAME
+  }
+
+  override fun dismissTopPresented() {
+
+  }
+
+  override fun alertWithArgs(options: ReadableMap, actionCallback: Callback) {
     UiThreadUtil.runOnUiThread {
       var alertDialog: AlertDialog? = null
       val dialogBuilder = AlertDialog.Builder(currentActivity!!)
@@ -156,6 +164,7 @@ class AlertsModule(reactContext: ReactApplicationContext) :
             val editText = LayoutInflater.from(dialogView.context).inflate(R.layout.input, null)
             val layout = editText.findViewById<TextInputLayout>(R.id.md_input_layout)
             layout.hint = placeholder
+            layout.placeholderTextColor = colorStateList(if (isDark) Color.WHITE else Color.parseColor("#ff212121"))
             layout.hintTextColor = colorStateList(if (isDark) Color.WHITE else Color.parseColor("#ff212121"))
             layout.editText?.setTextColor(if (isDark) Color.WHITE else Color.parseColor("#ff212121"))
             layout.editText?.setText(defaultValue ?: "")
@@ -178,5 +187,9 @@ class AlertsModule(reactContext: ReactApplicationContext) :
       alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
       alertDialog.show()
     }
+  }
+
+  override fun bottomSheetAlertWithArgs(params: ReadableMap, callback: Callback) {
+    BottomSheetAlertModule(currentActivity as AppCompatActivity?).show(params, callback)
   }
 }

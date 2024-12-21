@@ -44,9 +44,9 @@ RCT_EXPORT_MODULE(Alerts)
     });
     auto fieldsArray = RCTConvertVecToArray(params.fields(), ^id(JS::NativeAlerts::SpecAlertWithArgsParamsFieldsElement element) {
       return @{
-        @"placeholder": element.placeholder() == NULL ? @"" : element.placeholder(),
-        @"keyboardType": element.keyboardType() == NULL ? @"default" : element.keyboardType(),
-        @"defaultValue": element.defaultValue() == NULL ? @"" : element.defaultValue(),
+        @"placeholder": [RCTConvert NSString:element.placeholder()],
+        @"keyboardType": [RCTConvert NSString:element.keyboardType()],
+        @"defaultValue": [RCTConvert NSString:element.defaultValue()],
         @"security": element.security().has_value() ? element.security().value() ? @"1" : @"0" : @"0",
         @"id": element.id_()
       };
