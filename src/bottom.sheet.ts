@@ -1,9 +1,6 @@
-import {
-  Image,
-  type ImageRequireSource,
-  NativeModules,
-  processColor,
-} from 'react-native';
+import { Image, type ImageRequireSource, processColor } from 'react-native';
+
+import RNAlerts from './spec/NativeAlerts';
 
 export type BottomSheetAlertButtonStyle = 'default' | 'destructive' | 'cancel';
 type Appearance = {
@@ -13,10 +10,10 @@ type Appearance = {
   fontFamily?: string;
 };
 
-type AssetButtonIcon = {type: 'asset', icon: string}
-type DrawableButtonIcon = {type: 'drawable', icon: string}
-type ResourceButtonIcon = {type: 'require', icon: ImageRequireSource}
-type ButtonIcon = AssetButtonIcon | DrawableButtonIcon | ResourceButtonIcon
+type AssetButtonIcon = { type: 'asset'; icon: string };
+type DrawableButtonIcon = { type: 'drawable'; icon: string };
+type ResourceButtonIcon = { type: 'require'; icon: ImageRequireSource };
+type ButtonIcon = AssetButtonIcon | DrawableButtonIcon | ResourceButtonIcon;
 
 export interface BottomSheetAlertButton {
   readonly text: string;
@@ -44,15 +41,18 @@ interface BottomSheetAlertProperties {
 
 function processIcon(icon: ButtonIcon | undefined) {
   try {
-    if (!icon) return undefined
+    if (!icon) return undefined;
     if (icon.type === 'require') {
-      return {type: 'drawable', icon: Image.resolveAssetSource(icon.icon as number).uri}
+      return {
+        type: 'drawable',
+        icon: Image.resolveAssetSource(icon.icon as number).uri,
+      };
     }
-    return icon
+    return icon;
   } catch (e) {
-    console.warn('[BottomSheet.processIcon.errro]', e)
+    console.warn('[BottomSheet.processIcon.errro]', e);
   }
-  return undefined
+  return undefined;
 }
 
 export class sheetAlert {
@@ -60,43 +60,43 @@ export class sheetAlert {
     properties: BottomSheetAlertProperties
   ): Promise<string | undefined> {
     return new Promise((resolve) => {
-      NativeModules.BottomSheetAlert.show(
+      RNAlerts.bottomSheetAlertWithArgs(
         {
           ...properties,
-          iosTintColor: processColor(properties.iosTintColor),
+          iosTintColor: processColor(properties.iosTintColor) as any,
           title: !properties.title
             ? undefined
-            : {
-              text: properties.title.text,
-              appearance: !properties.title.appearance
-                ? undefined
-                : {
-                  ...properties.title.appearance,
-                  color: processColor(properties.title.appearance.color),
-                },
-            },
+            : ({
+                text: properties.title.text,
+                appearance: !properties.title.appearance
+                  ? undefined
+                  : {
+                      ...properties.title.appearance,
+                      color: processColor(properties.title.appearance.color),
+                    },
+              } as any),
           message: !properties.message
             ? undefined
-            : {
-              text: properties.message.text,
-              appearance: !properties.message.appearance
-                ? undefined
-                : {
-                  ...properties.message.appearance,
-                  color: processColor(properties.message.appearance.color),
-                },
-            },
+            : ({
+                text: properties.message.text,
+                appearance: !properties.message.appearance
+                  ? undefined
+                  : {
+                      ...properties.message.appearance,
+                      color: processColor(properties.message.appearance.color),
+                    },
+              } as any),
           buttons: properties.buttons.map((b) => ({
             ...b,
             icon: processIcon(b.icon),
             appearance: !b.appearance
               ? undefined
               : {
-                ...b.appearance,
-                color: processColor(b.appearance.color),
-                textAlign: b.appearance.textAlign ?? 'center',
-              },
-          })),
+                  ...b.appearance,
+                  color: processColor(b.appearance.color),
+                  textAlign: b.appearance.textAlign ?? 'center',
+                },
+          })) as any,
         },
         (index: number) => {
           if (index === -1) return resolve(undefined);

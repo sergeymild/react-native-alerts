@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import { StyleSheet, View } from 'react-native';
 import { AlertsExamples } from './alerts';
 import { SheetsExamples } from './sheets';

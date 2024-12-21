@@ -1,9 +1,9 @@
 #import <UIKit/UIKit.h>
 
-#import <React/RCTBridgeModule.h>
-#import <React/RCTInvalidating.h>
+#import <ReactCodegen/AlertsSpec/AlertsSpec.h>
+
 #import "BaseAlertController.h"
 
-@interface BaseAlertManager : NSObject <RCTBridgeModule, RCTInvalidating>
+@interface BaseAlertManager : NSObject <NativeAlertsSpec>
 @property (weak, nonatomic) BaseAlertController *presentedAlert;
 @end

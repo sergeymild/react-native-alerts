@@ -45,8 +45,22 @@ export const AlertsExamples: React.FC = () => {
             theme: 'light',
             title: 'Title',
             message: 'Message',
-            defaultValue: 'some',
-            type: 'plain-text',
+            fields: [
+              {
+                placeholder: 'some placeholder',
+                id: 'field-id',
+                keyboardType: 'decimal-pad',
+              },
+              {
+                placeholder: 'some placeholder',
+                id: 'field-id2',
+                defaultValue: 'Value',
+              },
+              {
+                id: 'field-id3',
+                security: true,
+              },
+            ],
             buttons: [
               { text: 'Default', style: 'default', id: 'base' },
               { text: 'Remove', style: 'destructive', id: 'remove' },
@@ -65,8 +79,15 @@ export const AlertsExamples: React.FC = () => {
             theme: 'dark',
             title: 'Title',
             message: 'Message',
-            defaultValue: 'some',
-            type: 'secure-text',
+            fields: [
+              {
+                placeholder: 'some placeholder',
+                id: 'field-id',
+                keyboardType: 'decimal-pad',
+                defaultValue: '',
+                security: false,
+              },
+            ],
             buttons: [
               { text: 'Default', style: 'default', id: 'base' },
               { text: 'Remove', style: 'destructive', id: 'remove' },

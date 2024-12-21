@@ -46,7 +46,7 @@ export const SheetsExamples: React.FC = () => {
       <TouchableOpacity
         onPress={async () => {
           const id = await sheetAlert.show({
-            theme: 'light',
+            theme: 'dark',
             message: {
               text: 'Some awesome message will be here',
               appearance: { fontSize: 14 },
@@ -54,7 +54,7 @@ export const SheetsExamples: React.FC = () => {
             title: {
               text: 'Some awesome title',
               appearance: {
-                fontSize: 20,
+                fontSize: 30,
               },
             },
             buttons: [

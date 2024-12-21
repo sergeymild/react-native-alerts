@@ -1,22 +1,7 @@
-import { type KeyboardType, NativeModules, Platform } from 'react-native';
+import { type KeyboardType } from 'react-native';
 import type { AlertButton, AlertParams } from './base.types';
 
-const LINKING_ERROR =
-  `The package 'react-native-a' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo managed workflow\n';
-
-const AlertManager = NativeModules.BaseAlert
-  ? NativeModules.BaseAlert
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
+import RNAlerts from './spec/NativeAlerts';
 
 type PromptParams = {
   title?: string;
@@ -34,7 +19,7 @@ type PromptParams = {
 
 export const alert = {
   dismissTopPresented() {
-    AlertManager.dismissTopPresented();
+    RNAlerts.dismissTopPresented();
   },
 
   alert(params: AlertParams) {
@@ -42,12 +27,13 @@ export const alert = {
       if (!params.buttons || params.buttons.length === 0) {
         params.buttons = [{ text: 'Ok', style: 'default', id: 'ok' }];
       }
-      AlertManager.alertWithArgs(
+      RNAlerts.alertWithArgs(
         {
           type: 'default',
-          title: params.title || '',
+          title: params.title || undefined,
           message: params.message || undefined,
           theme: params.theme,
+          fields: [],
           buttons: params.buttons.map((b) => ({
             text: b.text,
             style: b.style,
@@ -69,21 +55,21 @@ export const alert = {
       if (!params.buttons || params.buttons.length === 0) {
         params.buttons = [{ text: 'Ok', style: 'default', id: 'ok' }];
       }
-      AlertManager.alertWithArgs(
+      RNAlerts.alertWithArgs(
         {
           type: 'prompt',
           title: params.title || undefined,
           message: params.message || undefined,
           theme: params.theme,
-          fields: params.fields,
+          fields: params.fields ?? [],
           buttons: params.buttons.map((b) => ({
             text: b.text,
             style: b.style,
             id: b.id,
           })),
         },
-        (id: string, values: Record<string, string> | undefined) => {
-          resolve({ id, values });
+        (id: string, values: object | undefined) => {
+          resolve({ id, values: values as Record<string, string> });
         }
       );
     });
