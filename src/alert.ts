@@ -60,8 +60,14 @@ export const alert = {
           type: 'prompt',
           title: params.title || undefined,
           message: params.message || undefined,
-          theme: params.theme,
-          fields: params.fields ?? [],
+          theme: params.theme || undefined,
+          fields: (params.fields ?? []).map(f => ({
+            defaultValue: f.defaultValue || '',
+            keyboardType: f.keyboardType || 'default',
+            placeholder: f.placeholder || '',
+            id: f.id,
+            security: f.security,
+          })),
           buttons: params.buttons.map((b) => ({
             text: b.text,
             style: b.style,

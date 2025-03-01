@@ -104,7 +104,7 @@ class AlertsModule(reactContext: ReactApplicationContext) :
         options.getArray("buttons")?.let { buttons ->
           for (i in 0 until buttons.size()) {
             val button = buttons.getMap(i)
-            val hashMap = button.toHashMap()
+            val hashMap = button!!.toHashMap()
             val style = hashMap["style"] as String
             val id = hashMap["id"] as String
             val text = hashMap["text"] as String
@@ -154,7 +154,7 @@ class AlertsModule(reactContext: ReactApplicationContext) :
 
           for (i in 0 until fields.size()) {
             val field = fields.getMap(i)
-            val hashMap = field.toHashMap()
+            val hashMap = field!!.toHashMap()
             val placeholder = hashMap["placeholder"] as? String
             val defaultValue = hashMap["defaultValue"] as? String
             val keyboardType = hashMap["keyboardType"] as? String

@@ -126,7 +126,7 @@ class BottomSheetAlert(private val context: Activity, private val options: Reada
     var cancelButtonIndex = -1
     for (i in 0 until buttons.size()) {
       val readableMap = buttons.getMap(i)
-      val appearance = readableMap.getMap("appearance")
+      val appearance = readableMap!!.getMap("appearance")
       val style = readableMap.getString("style")
       val text = readableMap.getString("text")
       val icon = getIcon(context, readableMap.map("icon"))
@@ -161,7 +161,7 @@ class BottomSheetAlert(private val context: Activity, private val options: Reada
 
     if (cancelButtonIndex != -1) {
       val readableMap = buttons.getMap(cancelButtonIndex)
-      val appearance = readableMap.getMap("appearance")
+      val appearance = readableMap!!.getMap("appearance")
       val text = readableMap.getString("text")
       var color = if (isDark) Color.WHITE else Color.BLACK
       color = appearance.color(context, "color", color)
