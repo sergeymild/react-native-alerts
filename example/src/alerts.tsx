@@ -58,6 +58,7 @@ export const AlertsExamples: React.FC = () => {
               },
               {
                 id: 'field-id3',
+                placeholder: 'another placeholder',
                 security: true,
               },
             ],

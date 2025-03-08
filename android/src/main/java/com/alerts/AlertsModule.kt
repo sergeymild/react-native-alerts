@@ -1,5 +1,7 @@
 package com.alerts
 
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.module.annotations.ReactModule
 
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -19,12 +21,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.facebook.fbreact.specs.NativeAlertManagerSpec
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Callback
-import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.UiThreadUtil
 import com.google.android.material.textfield.TextInputLayout
+
 
 
 fun View.setCornerRadius(r: Float) {

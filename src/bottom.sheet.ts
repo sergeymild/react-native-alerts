@@ -1,6 +1,6 @@
 import { Image, type ImageRequireSource, processColor } from 'react-native';
 
-import RNAlerts from './spec/NativeAlerts';
+import RNAlerts from './NativeAlerts';
 
 export type BottomSheetAlertButtonStyle = 'default' | 'destructive' | 'cancel';
 type Appearance = {

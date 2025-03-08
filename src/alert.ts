@@ -1,7 +1,7 @@
 import { type KeyboardType } from 'react-native';
 import type { AlertButton, AlertParams } from './base.types';
 
-import RNAlerts from './spec/NativeAlerts';
+import RNAlerts from './NativeAlerts';
 
 type PromptParams = {
   title?: string;
@@ -61,7 +61,7 @@ export const alert = {
           title: params.title || undefined,
           message: params.message || undefined,
           theme: params.theme || undefined,
-          fields: (params.fields ?? []).map(f => ({
+          fields: (params.fields ?? []).map((f) => ({
             defaultValue: f.defaultValue || '',
             keyboardType: f.keyboardType || 'default',
             placeholder: f.placeholder || '',

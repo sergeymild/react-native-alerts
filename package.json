@@ -1,6 +1,6 @@
 {
   "name": "react-native-alerts",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Native Alerts for RN",
   "main": "src/index.tsx",
   "module": "src/index.tsx",
@@ -13,6 +13,7 @@
     "ios",
     "cpp",
     "*.podspec",
+    "react-native.config.js",
     "!ios/build",
     "!android/build",
     "!android/gradle",
@@ -25,9 +26,10 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn --cwd example",
-    "pods": "cd example && npx pod-install --quiet",
-    "bootstrap": "yarn example && yarn && yarn pods"
+    "example": "yarn workspace react-native-alerts-example",
+    "typecheck": "tsc",
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib"
   },
   "keywords": [
     "react-native",
@@ -38,30 +40,33 @@
     "type": "git",
     "url": "git+https://github.com/sergeymild/react-native-alerts.git"
   },
-  "author": "Sergei Golishnikov <sergeymild@yandex.ru> (https://github.com/sergeymild)",
+  "author": "SergeyMild <sergeymild@yandex.ru> (https://github.com/sergeymild)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/sergeymild/react-native-alerts/issues"
   },
   "homepage": "https://github.com/sergeymild/react-native-alerts#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "devDependencies": {
+    "@react-native-community/cli": "15.0.1",
     "@react-native/eslint-config": "^0.73.1",
     "@types/react": "^18.2.44",
     "del-cli": "^5.1.0",
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "postinstall-postinstall": "^2.1.0",
     "prettier": "^3.0.3",
-    "react": "18.3.1",
-    "react-native": "0.76.3",
-    "typescript": "^5.2.2",
-    "@react-native-community/cli": "16.0.0",
-    "@react-native-community/cli-platform-android": "16.0.0",
-    "@react-native-community/cli-platform-ios": "^16.0.0"
+    "react": "19.0.0",
+    "react-native": "0.78.0",
+    "react-native-builder-bob": "^0.37.0",
+    "release-it": "^17.10.0",
+    "turbo": "^1.10.7",
+    "typescript": "^5.2.2"
   },
   "resolutions": {
-    "@types/react": "18.3.1"
+    "@types/react": "^18.2.44"
   },
   "peerDependencies": {
     "react": "*",
@@ -74,6 +79,7 @@
       "prettier"
     ],
     "rules": {
+      "react/react-in-jsx-scope": "off",
       "prettier/prettier": [
         "error",
         {
@@ -97,17 +103,49 @@
     "trailingComma": "es5",
     "useTabs": false
   },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "codegen",
+      [
+        "commonjs",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json",
+          "esm": true
+        }
+      ]
+    ]
+  },
   "codegenConfig": {
-    "name": "AlertsSpec",
+    "name": "RNAlertsSpec",
     "type": "modules",
-    "jsSrcsDir": "src/spec",
+    "jsSrcsDir": "src",
     "outputDir": {
       "ios": "ios/generated",
       "android": "android/generated"
     },
     "android": {
       "javaPackageName": "com.alerts"
-    }
+    },
+    "includesGeneratedCode": true
+  },
+  "create-react-native-library": {
+    "type": "turbo-module",
+    "languages": "kotlin-objc",
+    "version": "0.48.3"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

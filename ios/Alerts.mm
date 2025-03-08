@@ -1,9 +1,10 @@
-#import "BaseAlertManager.h"
+#import "Alerts.h"
 #import <React/RCTConvert.h>
 #import "BottomSheetAlertPresenter.h"
 
-@implementation BaseAlertManager
-RCT_EXPORT_MODULE(Alerts)
+@implementation Alerts
+RCT_EXPORT_MODULE()
+
 - (dispatch_queue_t)methodQueue
 {
   return dispatch_get_main_queue();
@@ -51,9 +52,9 @@ RCT_EXPORT_MODULE(Alerts)
         @"id": element.id_()
       };
     });
-    
+
     if (!title && !message) return;
-    
+
     BaseAlertController *alertController = [BaseAlertController alertControllerWithTitle:title
                                                                                  message:nil
                                                                           preferredStyle:UIAlertControllerStyleAlert];
@@ -64,13 +65,13 @@ RCT_EXPORT_MODULE(Alerts)
     } else {
       [alertController setOverrideUserInterfaceStyle:UIUserInterfaceStyleUnspecified];
     }
-    
+
     if ([type isEqualToString:@"prompt"]) {
       for (NSDictionary<NSString *, id> *field in fieldsArray) {
         NSString *defaultValue = (NSString*)[field valueForKey:@"defaultValue"];
         UIKeyboardType keyboardType = [RCTConvert UIKeyboardType:[field valueForKey:@"keyboardType"]];
         BOOL isSecurity = [field[@"security"] isEqual: @"1"];
-        
+
         [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
           textField.secureTextEntry = isSecurity;
           textField.keyboardType = keyboardType;
@@ -80,36 +81,36 @@ RCT_EXPORT_MODULE(Alerts)
         }];
       }
     }
-    
-    
-    
+
+
+
     alertController.message = message;
-    
+
     for (NSDictionary<NSString *, id> *button in buttonsArray) {
       //RCTLogError(@"Button definitions should have exactly one key.");
       NSString *buttonId = (NSString*)button[@"id"];
       NSString *buttonTitle = (NSString*)button[@"text"];
       NSString *rawButtonStyle = (NSString*)button[@"style"];
-      
+
       UIAlertActionStyle buttonStyle = UIAlertActionStyleDefault;
       if ([rawButtonStyle isEqualToString:@"cancel"]) {
         buttonStyle = UIAlertActionStyleCancel;
       } else if ([rawButtonStyle isEqualToString:@"destructive"]) {
         buttonStyle = UIAlertActionStyleDestructive;
       }
-      
-      __weak BaseAlertManager *weakSelf = self;
+
+      __weak Alerts *weakSelf = self;
       [alertController
        addAction:[UIAlertAction
                   actionWithTitle:buttonTitle
                   style:buttonStyle
                   handler:^(__unused UIAlertAction *action) {
-        
+
         if ([type isEqualToString:@"prompt"]) {
           NSMutableDictionary<NSString*, NSString*>* values = [[NSMutableDictionary alloc] initWithCapacity:[fieldsArray count]];
           for (NSDictionary<NSString *, id> *field in fieldsArray) {
             NSString* fieldId = field[@"id"];
-            
+
             for (UITextField* textField in weakSelf.presentedAlert.textFields) {
               if ([fieldId isEqualToString:textField.accessibilityIdentifier]) {
                 values[fieldId] = textField.text;
@@ -120,13 +121,13 @@ RCT_EXPORT_MODULE(Alerts)
         } else {
           callback(@[ buttonId ]);
         }
-        
-        
+
+
         [weakSelf.presentedAlert hide];
         weakSelf.presentedAlert = NULL;
       }]];
     }
-    
+
     self.presentedAlert = alertController;
     [alertController show:YES completion:nil];
   });
@@ -138,8 +139,10 @@ RCT_EXPORT_MODULE(Alerts)
   });
 }
 
-- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params {
-  return std::make_shared<facebook::react::NativeAlertsSpecJSI>(params);
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params
+{
+    return std::make_shared<facebook::react::NativeAlertsSpecJSI>(params);
 }
 
 @end

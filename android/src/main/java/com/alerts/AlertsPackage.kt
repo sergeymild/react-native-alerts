@@ -1,24 +1,25 @@
 package com.alerts
 
-import com.facebook.react.TurboReactPackage
+import com.facebook.react.BaseReactPackage
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.model.ReactModuleInfo
 import com.facebook.react.module.model.ReactModuleInfoProvider
+import java.util.HashMap
 
-
-class AlertsPackage : TurboReactPackage() {
-  override fun getModule(name: String, context: ReactApplicationContext): NativeModule? {
-    if (AlertsModule.NAME == name) {
-      return AlertsModule(context);
+class AlertsPackage : BaseReactPackage() {
+  override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? {
+    return if (name == AlertsModule.NAME) {
+      AlertsModule(reactContext)
+    } else {
+      null
     }
-    return null
   }
 
   override fun getReactModuleInfoProvider(): ReactModuleInfoProvider {
     return ReactModuleInfoProvider {
-      val moduleInfoMap: MutableMap<String, ReactModuleInfo> = HashMap()
-      moduleInfoMap[AlertsModule.NAME] = ReactModuleInfo(
+      val moduleInfos: MutableMap<String, ReactModuleInfo> = HashMap()
+      moduleInfos[AlertsModule.NAME] = ReactModuleInfo(
         AlertsModule.NAME,
         AlertsModule.NAME,
         false,  // canOverrideExistingModule
@@ -26,8 +27,7 @@ class AlertsPackage : TurboReactPackage() {
         false,  // isCxxModule
         true // isTurboModule
       )
-      moduleInfoMap
+      moduleInfos
     }
   }
-
 }

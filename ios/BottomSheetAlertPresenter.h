@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import <ReactCodegen/AlertsSpec/AlertsSpec.h>
+
+#import "generated/RNAlertsSpec/RNAlertsSpec.h"
 
 @interface AppAlertController : UIAlertController
 @property (nonatomic, copy) void (^onDismiss)(void);
