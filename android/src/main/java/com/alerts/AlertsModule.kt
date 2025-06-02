@@ -69,9 +69,10 @@ class AlertsModule(reactContext: ReactApplicationContext) :
 
   override fun alertWithArgs(options: ReadableMap, actionCallback: Callback) {
     UiThreadUtil.runOnUiThread {
+      val activity = currentActivity ?: return@runOnUiThread
       var alertDialog: AlertDialog? = null
-      val dialogBuilder = AlertDialog.Builder(currentActivity!!)
-      val dialogView = LayoutInflater.from(currentActivity!!).inflate(R.layout.layout_alert_prompt, null)
+      val dialogBuilder = AlertDialog.Builder(activity)
+      val dialogView = LayoutInflater.from(activity).inflate(R.layout.layout_alert_prompt, null)
       dialogBuilder.setView(dialogView)
       dialogView.setCornerRadius(20f)
 

@@ -13,13 +13,14 @@ class BottomSheetAlertModule(private val activity: AppCompatActivity?) {
   @ReactMethod
   fun show(options: ReadableMap, actionCallback: Callback) {
     UiThreadUtil.runOnUiThread {
+      val activity = activity ?: return@runOnUiThread
       if (previousDialog != null) {
         val bottomSheetDialog = previousDialog!!.get()
         bottomSheetDialog?.dismiss()
         previousDialog?.clear()
       }
 
-      val currentNightMode = activity!!.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+      val currentNightMode = activity.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
       var isDarkMode = false
       if (!options.hasKey("theme")) {
         when (currentNightMode) {
@@ -30,7 +31,7 @@ class BottomSheetAlertModule(private val activity: AppCompatActivity?) {
         isDarkMode = options.getString("theme") == "dark"
       }
 
-      val bottomSheetDialog: BottomSheetDialog = BottomSheetAlert(activity!!, options).create(isDarkMode, actionCallback)
+      val bottomSheetDialog: BottomSheetDialog = BottomSheetAlert(activity, options).create(isDarkMode, actionCallback)
         ?: return@runOnUiThread
       previousDialog = WeakReference(bottomSheetDialog)
       bottomSheetDialog.show()
