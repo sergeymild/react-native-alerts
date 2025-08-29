@@ -26,7 +26,8 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.UiThreadUtil
 import com.google.android.material.textfield.TextInputLayout
-
+import androidx.core.graphics.toColorInt
+import androidx.core.graphics.drawable.toDrawable
 
 
 fun View.setCornerRadius(r: Float) {
@@ -78,17 +79,25 @@ class AlertsModule(reactContext: ReactApplicationContext) :
       dialogView.setCornerRadius(20f)
 
       var isDark = false
+      var isLight = false
+      val darkColor = "#ff212121".toColorInt()
+      val lightColor = "#ffffff".toColorInt()
 
       if (options.hasKey("theme")) {
         if (options.getString("theme") == "dark") {
           isDark = true
-          dialogView.setBackgroundColor(Color.parseColor("#ff212121"))
+          dialogView.setBackgroundColor(darkColor)
+        }
+        if (options.getString("theme") == "light") {
+          isLight = true
+          dialogView.setBackgroundColor(lightColor)
         }
       }
 
       if (options.hasKey("title")) {
         dialogView.findViewById<TextView>(R.id.alert_title).also {
           if (isDark) it.setTextColor(Color.WHITE)
+          else if (isLight) it.setTextColor(Color.BLACK)
           it.text = options.getString("title")
           it.text = options.getString("title")
           it.visibility = View.VISIBLE
@@ -98,6 +107,7 @@ class AlertsModule(reactContext: ReactApplicationContext) :
       if (options.hasKey("message")) {
         dialogView.findViewById<TextView>(R.id.alert_message).also {
           if (isDark) it.setTextColor(Color.WHITE)
+          else if (isLight) it.setTextColor(Color.BLACK)
           it.text = options.getString("message")
           it.visibility = View.VISIBLE
         }
@@ -127,6 +137,7 @@ class AlertsModule(reactContext: ReactApplicationContext) :
             if (style == "cancel") {
               val btn = dialogView.findViewById<Button>(R.id.cancel)
               if (isDark) btn.setTextColor(Color.WHITE)
+              else if (isLight) btn.setTextColor(Color.BLACK)
               btn.visibility = View.VISIBLE
               btn.text = text
               btn.setOnClickListener(clickListener)
@@ -142,6 +153,7 @@ class AlertsModule(reactContext: ReactApplicationContext) :
             if (style == "default") {
               val btn = dialogView.findViewById<Button>(R.id.positive)
               if (isDark) btn.setTextColor(Color.WHITE)
+              else if (isLight) btn.setTextColor(Color.BLACK)
               btn.visibility = View.VISIBLE
               btn.text = text
               btn.setOnClickListener(clickListener)
@@ -168,9 +180,9 @@ class AlertsModule(reactContext: ReactApplicationContext) :
             val editText = LayoutInflater.from(dialogView.context).inflate(R.layout.input, null)
             val layout = editText.findViewById<TextInputLayout>(R.id.md_input_layout)
             layout.hint = placeholder
-            layout.placeholderTextColor = colorStateList(if (isDark) Color.WHITE else Color.parseColor("#ff212121"))
-            layout.hintTextColor = colorStateList(if (isDark) Color.WHITE else Color.parseColor("#ff212121"))
-            layout.editText?.setTextColor(if (isDark) Color.WHITE else Color.parseColor("#ff212121"))
+            layout.placeholderTextColor = colorStateList(if (isDark) lightColor else darkColor)
+            layout.hintTextColor = colorStateList(if (isDark) lightColor else darkColor)
+            layout.editText?.setTextColor(if (isDark) lightColor else darkColor)
             layout.editText?.setText(defaultValue ?: "")
 
             if (keyboardType != null && (keyboardType == "number-pad" || keyboardType == "decimal-pad")) {
@@ -188,7 +200,7 @@ class AlertsModule(reactContext: ReactApplicationContext) :
       }
 
       alertDialog = dialogBuilder.create()
-      alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+      alertDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
       alertDialog.show()
     }
   }
