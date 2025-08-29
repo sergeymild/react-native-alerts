@@ -74,6 +74,7 @@ class AlertsModule(reactContext: ReactApplicationContext) :
       val dialogBuilder = AlertDialog.Builder(activity)
       val dialogView = LayoutInflater.from(activity).inflate(R.layout.layout_alert_prompt, null)
       dialogBuilder.setView(dialogView)
+      dialogBuilder.setCancelable(false)
       dialogView.setCornerRadius(20f)
 
       var isDark = false
